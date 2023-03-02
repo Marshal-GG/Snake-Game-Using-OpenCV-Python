@@ -13,6 +13,7 @@ class SnakeGameClass:
         self.currentLength = 0  # Total length of snake
         self.allowedLength = 150  # Total allowed length
         self.previousHead = 0, 0  # Previous head point
+        self.direction = "RIGHT"  # Initial direction
 
         # Load food images from directory
         foodDir = "images/foods"
@@ -53,6 +54,30 @@ class SnakeGameClass:
             px, py = self.previousHead  # px = previous x
             cx, cy = currentHead  # cx = current x
 
+            # Update direction based on current and previous head positions
+            if cx > px:
+                self.direction = "RIGHT"
+            elif cx < px:
+                self.direction = "LEFT"
+            elif cy > py:
+                self.direction = "DOWN"
+            elif cy < py:
+                self.direction = "UP"
+
+            # Move snake in the current direction
+            if self.direction == "RIGHT":
+                cx += 10
+            elif self.direction == "LEFT":
+                cx -= 10
+            elif self.direction == "DOWN":
+                cy += 10
+            elif self.direction == "UP":
+                cy -= 10
+
+            # Check if snake is outside the screen
+            if cx < 0 or cy < 0 or cx > 1280 or cy > 720:
+                self.gameOver = True
+
             self.points.append([cx, cy])
             distance = math.hypot(cx - px, cy - py)
             self.lengths.append(distance)
@@ -65,7 +90,6 @@ class SnakeGameClass:
                     self.currentLength -= length
                     self.lengths.pop(i)
                     self.points.pop(i)
-
                     if self.currentLength < self.allowedLength:
                         break
 
@@ -81,10 +105,13 @@ class SnakeGameClass:
             if self.points:
                 for i, point in enumerate(self.points):
                     if i != 0:
-                        cv.line(imgMain, self.points[i-1],
-                                self.points[i], (180, 60, 255), 5)
-                cv.circle(imgMain, self.points[-1],
-                          10, (200, 0, 200), cv.FILLED)
+                        # Draw a line between the current and previous point
+                        prev_point = self.points[i-1]
+                        cv.line(imgMain, (int(prev_point[0]), int(prev_point[1])), (int(
+                            point[0]), int(point[1])), (180, 60, 255), 15)
+                # Draw the head of the snake as a circle
+                cv.circle(imgMain, (int(
+                    self.points[-1][0]), int(self.points[-1][1])), 15, (200, 0, 200), cv.FILLED)
 
             # Draw Food
             rx, ry = self.foodPoints
@@ -101,15 +128,29 @@ class SnakeGameClass:
             minDist = cv.pointPolygonTest(pts, (cx, cy), True)
             # print(minDist)
 
-            if -1 <= minDist <= 1:
-                print('Hit')
-                self.gameOver = True  # Resets the Game
-                self.points = []  # All points of the snake
-                self.lengths = []  # Distance between each points
-                self.currentLength = 0  # Total length of snake
-                self.allowedLength = 150  # Total allowed length
-                self.previousHead = 0, 0  # Previous head point
-                self.randomFoodAndLocation()
-                self.score = 0
+            if self.points:
+                # Check if snake is moving
+                if self.points[-1] != self.previousHead:
+                    self.previousHead = self.points[-1]
+                    self.gameOverCounter = 0
+                else:
+                    self.gameOverCounter += 1
+
+                # Check if snake hits the boundary
+                if cx < 50 or cx > 1100 or cy < 50 or cy > 650:
+                    self.gameOverCounter = 0
+                    self.gameOver = True
+
+                # Check for collision with body of snake
+                if -1 <= minDist <= 1 and self.gameOverCounter > 10:
+                    print('Hit')
+                    self.gameOver = True
+                    self.points = []  # All points of the snake
+                    self.lengths = []  # Distance between each points
+                    self.currentLength = 0  # Total length of snake
+                    self.allowedLength = 150  # Total allowed length
+                    self.previousHead = 0, 0  # Previous head point
+                    self.randomFoodAndLocation()
+                    self.score = 0
 
         return imgMain
