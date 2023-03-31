@@ -2,7 +2,7 @@ import cv2 as cv
 from cvzone.HandTrackingModule import HandDetector
 from snake_game import SnakeGameClass
 
-cap = cv.VideoCapture(1)
+cap = cv.VideoCapture(2)
 cap.set(3, 1280)
 cap.set(4, 720)
 

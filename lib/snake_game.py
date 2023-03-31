@@ -45,7 +45,7 @@ class SnakeGameClass:
     def update(self, imgMain, currentHead):
 
         if self.gameOver:
-            cvzone.putTextRect(imgMain, 'Gmae Over', [
+            cvzone.putTextRect(imgMain, 'Game Over', [
                                300, 400], scale=7, thickness=5, offset=20)
             cvzone.putTextRect(imgMain, f'Your Score: {self.score}', [
                                300, 550], scale=7, thickness=5, offset=20)
@@ -66,13 +66,13 @@ class SnakeGameClass:
 
             # Move snake in the current direction
             if self.direction == "RIGHT":
-                cx += 10
+                cx += 1
             elif self.direction == "LEFT":
-                cx -= 10
+                cx -= 1
             elif self.direction == "DOWN":
-                cy += 10
+                cy += 1
             elif self.direction == "UP":
-                cy -= 10
+                cy -= 1
 
             # Check if snake is outside the screen
             if cx < 0 or cy < 0 or cx > 1280 or cy > 720:
